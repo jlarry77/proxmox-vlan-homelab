@@ -1,10 +1,13 @@
-# proxmox-vlan-homelab
-Documenting the transition from a flat network to VLan aware network.
+# Transitioning a Proxmox Cluster from a Flat Network to a VLAN
+![Proxmox](https://img.shields.io/badge/Proxmox-ED1C24?style=for-the-badge&logo=proxmox&logoColor=white)
+![OPNsense](https://img.shields.io/badge/OPNsense-EF4F1A?style=for-the-badge&logo=opnsense&logoColor=white)
+![CARP](https://img.shields.io/badge/CARP-800000?style=for-the-badge&logo=freebsd&logoColor=white)
 
-
-Switch: Netgear GS108Ev4, VLAN-capable.
+# Requirements
+Switch: Must be a managed switch, I'm using a Netgear GS108Ev4, VLAN-capable.
 VLANs configured: Yes (e.g., Default, Management, Cluster, Monitoring, Security, etc.).
-Current mode: Basic 802.1Q VLAN with ports mostly in Access mode for VLAN 1.
+Current Router Mode: Basic 802.1Q VLAN.
+
 # Transition plan:
 - Move 4-node Proxmox cluster to a dedicated VLAN (e.g., VLAN 20 - "Cluster").
 - Add bare-metal Ubuntu server to VLAN.
@@ -77,7 +80,19 @@ ifrelaod -a
 # 1.2 Update the VLAN Settings in the Proxmox GUI
 
 - In the Proxmox GUI navigate to the Network tab for the node you're transitioning:<NODE> -> System -> Network
-  - Highlight the Node's Network Interface and click 'Edit'
+  - Highlight the Node's Linux Bridge and click 'Edit' (this will most likely be named vmbr0 in Proxmox), you should also see 'vmbr0.20' as Type Linux VLAN
   - On the right side of the the 'Edit: Linux Bridge' pop-up, click VLAN Aware, and 'OK'
 file:///home/larryman/Pictures/Screenshots/Screenshot%20from%202025-08-04%2011-15-05.png<img width="450" height="auto" alt="screenshot" src="https://github.com/user-attachments/assets/354d23ee-1d47-4803-933d-008338b7bcbf" />
+
+# 1.3 Switch the Mode on the appropriate port to 'Trunk(uplink)' and save, and verify in the terminal.
+You should see both vmbr0 and vmbr0.20 in the ouput:
+```bash
+$ ip route
+default via 192.168.X.X dev vmbr0 proto kernel onlink 
+10.0.20.0/24 dev vmbr0.20 proto kernel scope link src 10.0.20.X 
+<snipped>
+192.X.X.X/24 dev vmbr0 proto kernel scope link src 192.X.X.X
+``` 
+
+
 
