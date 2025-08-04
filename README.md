@@ -118,10 +118,10 @@ default via 192.168.X.X dev vmbr0 proto kernel onlink
 
 The installer will prompt you to configure network interfaces. You'll only see one interface which should be vtnet0, if it's not present, assign vtnet0 as your LAN interface.
     * Do not configure a WAN interface at this stage. You're using a single interface for everything.
-
+    
 OPNsense default credentials to enter installation:
-Username: installer
-Password: opnsense
+- Username: installer
+- Password: opnsense
 
 Use these credentials to log in. You will then be able to proceed with the installation process.
     * If you somehow get past the installer and it asks for a login to the console:
